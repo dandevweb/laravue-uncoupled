@@ -1,9 +1,21 @@
 <template>
-  <v-app>
-    <v-app-bar title="Filmes" class="text-center" />
+
+    <v-app theme="dark">
+      <v-navigation-drawer
+    v-model="isFavoriteOpen"
+    temporary
+    location="right"
+    >
+     <div class="pa-4">
+      <MyFavorite/>
+     </div>
+    </v-navigation-drawer>
+
+    <v-app-bar title="Filmes" class="text-center">
+      <v-btn icon="mdi-heart" @click="isFavoriteOpen = !isFavoriteOpen"/>
+    </v-app-bar>
     <v-main class="mt-4">
       <v-container>
-        {{ isLoading }}
         <v-row>
           <v-col
             v-for="movie in movies.data"
@@ -12,16 +24,9 @@
             md="6"
             lg="3"
             >
-            <v-card class="border">
-              <v-card-text>
-                <h2>{{ movie.name }}</h2>
-                <p>{{ movie.description }}</p>
-                <div>{{ movie.duration }}</div>
-              </v-card-text>
-            </v-card>
+           <movie-card :movie="movie"/>
+
           </v-col>
-          <v-col>2</v-col>
-          <v-col>3</v-col>
         </v-row>
       </v-container>
 
@@ -32,12 +37,24 @@
 <script setup>
   import axios from 'axios';
   import { useAsyncState } from '@vueuse/core'
+  import { ref } from 'vue'
+  import MyFavorite from '@/components/MyFavorite';
+  import MovieCard from '@/components/MovieCard';
+  import { useMovie} from '@/composables/useMovie'
+
+  const {favorite, add:addMovieToFavorite} = useMovie()
+
+  const isFavoriteOpen = ref(false);
 
   const { state: movies, isReady, isLoading } = useAsyncState(
-  axios
-    .get('http://localhost:8000/api/movies')
-    .then(t => t.data),
-  {},
-)
+    axios
+      .get('http://localhost:8000/api/movies')
+      .then(t => t.data),
+    {},
+  )
+
+  function addToFavorite(movie) {
+    console.log(movie)
+  }
 
 </script>
